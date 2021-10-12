@@ -23,7 +23,7 @@ const cookie = (res, name, value, options = {}) => {
   res.setHeader('Set-Cookie', serialize(name, String(stringValue), options));
 };
 
-const apiPageHandler = (handler) => (req, res) => {
+const apiPageHandler = (handler) => async (req, res) => {
   // set cors before moving on
   await cors(req, res);
 

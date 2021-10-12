@@ -37,20 +37,12 @@ export default function Index(props) {
 function getPageComponent(_props, asPath) {
   switch (asPath) {
     case '/hello':
-      return Hello;
+      return () => <div className={styles.hello}> hello</div>
     case '/':
-      return Main;
+      return () => <h2>main</h2>;
     default:
       return '';
   }
-}
-
-function Main() {
-  return <h2>main</h2>;
-}
-
-function Hello() {
-  return <div className={styles.hello}> hello</div>;
 }
 
 export function getServerSideProps(ctx) {
