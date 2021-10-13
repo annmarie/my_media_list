@@ -1,6 +1,6 @@
 import apiPageHandler from 'middleware/api-page-handler';
 
-const data = [
+const payload = [
   {
     name: 'Sally Silly Stuff',
     price: 2.5,
@@ -10,7 +10,7 @@ const data = [
     updated_at: '20170412'
   },
   {
-    name: 'Tony\'s Thoughts and Poems',
+    name: "Tony's Thoughts and Poems",
     price: 2.5,
     frequency: 'monthly',
     description: 'podcast',
@@ -32,20 +32,11 @@ const data = [
     description: 'application',
     created_at: '20161112',
     updated_at: '20190822'
-  },
-]
-
-async function requestHandler(req, res) {
-  const method = req.method;
-  switch (method) {
-    case 'POST': {
-      res.status(200).json({ data });
-      break;
-    }
-    default: {
-      res.status(200).json({ data });
-    }
   }
+];
+
+async function requestHandler(_req, res) {
+  res.status(200).json({ payload });
 }
 
 export default apiPageHandler(requestHandler);

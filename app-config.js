@@ -6,7 +6,8 @@ const appConfig = {
     { id: 1, title: 'Home', path: '/' },
     { id: 2, title: 'Hello', path: '/hello' }
   ],
-  lsKey: 'my-media-list',
+  localStorageKey: 'my-media-list',
+  dataApiUrl: 'http://localhost:8080/api/data'
 };
 
 export default appConfig;
