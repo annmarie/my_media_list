@@ -1,13 +1,15 @@
 import Link from 'next/link';
 import _ from 'lodash';
 import { useRouter } from 'next/router';
+import { v4 as uuidv4 } from 'uuid';
 
 export default function NavigationComponent(props) {
   const router = useRouter();
   const asPath = _.get(router, 'asPath', '/');
 
   const makeNavLink = (link) => {
-    const { id, title, path } = link;
+    const id = uuidv4();
+    const { title, path } = link;
 
     return asPath == path ? (
       <li key={id}>{title}</li>

@@ -3,11 +3,10 @@ const appConfig = {
   title: 'My Media List',
   copyrightText: 'copyright notice',
   navLinks: [
-    { id: 1, title: 'Home', path: '/' },
-    { id: 2, title: 'Hello', path: '/hello' }
+    { title: 'Home', path: '/' },
+    { title: 'Create', path: '/subscription' }
   ],
-  localStorageKey: 'my-media-list',
-  dataApiUrl: 'http://localhost:8080/api/data'
+  localStorageKey: 'my-media-list-v2'
 };
 
 export default appConfig;

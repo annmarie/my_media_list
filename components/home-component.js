@@ -9,18 +9,27 @@ export default function HomeComponent(props) {
     const storedData = localStorage.getItem(key);
     if (storedData)
       try {
-        setData(JSON.parse(storedData));
+        const storedJson = JSON.parse(storedData);
+        if (_.get(storedJson, 'payload')) setData(JSON.parse(storedData));
       } catch (e) {
         // catch error
       }
   }, [props, setData]);
 
   if (!data) {
-    const initData = () => {
-      const demoData = JSON.stringify(props.data);
+    // initialize demo data
+    const initData = async () => {
       const key = props.localStorageKey;
-      localStorage.setItem(key, demoData);
-      setData(props.data);
+      let demoData = {};
+      try {
+        const rset = await fetch('/api/data');
+        demoData = await rset.json();
+      } catch (err) {
+        console.log('data not found');
+        console.log(err);
+      }
+      localStorage.setItem(key, JSON.stringify(demoData));
+      setData(demoData);
     };
 
     return (

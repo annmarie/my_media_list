@@ -7,8 +7,8 @@ export default function PageComponent(props) {
   const asPath = router.asPath;
 
   switch (asPath) {
-    case '/hello':
-      return <div className={styles.hello}> hello</div>;
+    case '/subscription':
+      return <div className={styles.hello}> create subscription</div>;
     case '/':
       return <HomeComponent {...props} />;
     default:

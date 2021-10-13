@@ -1,4 +1,3 @@
-import _ from 'lodash';
 import appPageHandler from 'middleware/app-page-handler';
 import appConfig from 'app-config';
 import Head from 'next/head';
@@ -27,26 +26,13 @@ export async function getServerSideProps(ctx) {
   // middleware
   appPageHandler(ctx.req, ctx.res);
 
-  // check query paths with navLinks list
-  let queryPath = _.get(ctx, 'query.path', '');
-  queryPath = _.isArray(queryPath) ? `/${queryPath.join('/')}` : `/${queryPath}`;
+  // check query paths with navLinks list from app-config
+  let [queryPath] = ctx.req.url.split('?');
+  queryPath = queryPath.startsWith('/_next') ? '/' : queryPath;
   const navPaths = appConfig.navLinks.map((navLink) => navLink.path);
   const validUrl = navPaths.includes(queryPath) ? true : false;
   // if no valid url path is found render 404 page
   if (!validUrl) return { notFound: true };
-
-  // we only need to add the demo data on the home page
-  if (queryPath === '/') {
-    let data = {};
-    try {
-      const rset = await fetch(`${appConfig.dataApiUrl}`);
-      data = await rset.json();
-    } catch (err) {
-      console.log('data not found');
-      console.log(err);
-    }
-    _.set(appConfig, 'data', data);
-  }
 
   // pass config data to page props
   return { props: { ...appConfig } };
