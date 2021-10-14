@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import Link from 'next/link';
 import styles from 'styles/components/Home.module.scss';
 import { useState } from 'react';
 import { QueryClient, QueryClientProvider, useQuery } from 'react-query';
@@ -70,12 +71,16 @@ function InitButton(props) {
 
 const TableData = (subscriptions) => {
   const displayData = (item) => {
+    const href = `/subscription/${item.id}`;
     return (
-      <tr key={item.id}>
-        <td>{item.name}</td>
+      <tr key={item.id} id={item.id}>
+        <td>
+          <Link href={href}>
+            <a>{item.name}</a>
+          </Link>
+        </td>
         <td>{item.price}</td>
         <td>{item.frequency}</td>
-        <td>edit</td>
         <td>delete</td>
       </tr>
     );
@@ -89,7 +94,6 @@ const TableData = (subscriptions) => {
             <th>name</th>
             <th>price</th>
             <th>frequency</th>
-            <th></th>
             <th></th>
           </tr>
         </thead>

@@ -5,7 +5,7 @@ module.exports = (phase, { defaultConfig }) => {
     env: {
       // set env vars
       MY_APP_KEY: process.env.MY_APP_KEY,
-      phase
+      APP_PHASE: phase
     },
     async rewrites() {
       return {
