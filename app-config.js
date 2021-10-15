@@ -3,8 +3,8 @@ const appConfig = {
   title: 'My Media List',
   copyrightText: 'copyright notice',
   navLinks: [
-    { title: 'Home', path: '/' },
-    { title: 'Create', path: '/subscription' }
+    { title: 'Administration', path: '/' },
+    { title: 'Creation', path: '/subscription' }
   ],
   localStorageKey: 'my-media-list-v2'
 };
