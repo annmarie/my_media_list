@@ -2,7 +2,9 @@ import _ from 'lodash';
 import { useForm } from 'react-hook-form';
 import { ErrorMessage } from '@hookform/error-message';
 import styles from 'styles/components/Edit.module.scss';
+import { useState } from 'react';
 import { QueryClient, QueryClientProvider, useQuery } from 'react-query';
+
 
 export default function EditComponent(props) {
   const queryClient = new QueryClient();
@@ -17,27 +19,16 @@ export default function EditComponent(props) {
 }
 
 function SubscriptionEdit(props) {
-  const { status, data } = useQuery('subscriptions', async () => {
-    return new Promise((good, bad) => {
-      const storedData = localStorage.getItem(props.localStorageKey);
-      if (storedData) {
-        try {
-          const storedJson = JSON.parse(storedData);
-          if (_.get(storedJson, 'payload')) {
-            good(storedJson);
-          } else {
-            // invalid local storage found return empty data set
-            good({});
-          }
-        } catch (e) {
-          bad(e);
-        }
-      }
-      // no local storage found return empty data set
-      good({});
+  const [stateData, setData] = useState(0);
+  const { status } = useQuery('subscription', async () => {
+    return new Promise((good) => {
+      const id = _.get(props, 'id', 0);
+      const key = props.localStorageKey;
+      const storedData = localStorage.getItem(`${key}-${id}`);
+      good(JSON.parse(storedData));
     }).then((data) => {
-      const id = props.id;
-      return _.find(_.get(data, 'payload', {}), { id });
+      setData(data)
+      return data;
     });
   });
 
@@ -45,20 +36,39 @@ function SubscriptionEdit(props) {
 
   return (
     <div className={styles.edit}>
-      <SubscriptionForm {...props} item={data} />
+      <SubscriptionForm {...props} item={stateData} setItem={setData} />
     </div>
   );
 }
 
 function SubscriptionForm(props) {
+  const getNewDateFormatted = () => {
+    const date = new Date().toJSON().slice(0, 10);
+    return date.replace(/-/g, '');
+  };
+  const onSubmit = async (item) => {
+    return new Promise((good) => {
+      const id = props.id;
+      const key = props.localStorageKey;
+      if (id) {
+        _.set(item, 'id', id);
+        _.set(item, 'created_at', props.item.created_at);
+        _.set(item, 'updated_at', getNewDateFormatted());
+        localStorage.setItem(`${key}-${id}`, JSON.stringify(item));
+        good(item);
+      } else {
+        good(props.item);
+      }
+    }).then((data) => props.setItem(data));
+  };
+
   const {
     register,
     handleSubmit,
     formState: { errors }
   } = useForm();
 
-  const onSubmit = (data) => console.log(data);
-  const { name, price, frequency, description } = props.item;
+  const { name, price, frequency, description, updated_at, created_at } = props.item || {};
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
@@ -87,6 +97,12 @@ function SubscriptionForm(props) {
       <br />
       <input type="submit" />
       <br />
+      <ul>
+        <li key={updated_at}>updated at: {updated_at}</li>
+        <li key={created_at}>created at: {created_at}</li>
+      </ul>
     </form>
   );
 }
+
+

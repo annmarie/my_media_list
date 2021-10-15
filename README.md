@@ -12,7 +12,7 @@ yarn
 yarn dev
 ```
 
-### Visit the developm server:
+### Visit the development server:
 
 ```
 http://localhost:8080
