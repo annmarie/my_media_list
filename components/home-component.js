@@ -81,7 +81,7 @@ const TableData = (subscriptions) => {
         </td>
         <td>{item.price}</td>
         <td>{item.frequency}</td>
-        <td>delete</td>
+        <td><img src="/svgs/delete.svg" width="30px" height="30px" /></td>
       </tr>
     );
   };
