@@ -1,60 +1,49 @@
 import _ from 'lodash';
 import { useForm } from 'react-hook-form';
 import { ErrorMessage } from '@hookform/error-message';
+import { v4 as uuidv4 } from 'uuid';
 import styles from 'styles/components/Create.module.scss';
-import { QueryClient, QueryClientProvider, useQuery } from 'react-query';
+import { useRouter } from 'next/router'
+
 
 export default function CreateComponent(props) {
-  const queryClient = new QueryClient();
-
-  return (
-    <>
-      <QueryClientProvider client={queryClient}>
-        <SubscriptionCreate {...props} />
-      </QueryClientProvider>
-    </>
-  );
-}
-
-function SubscriptionCreate(props) {
-  const { status, data } = useQuery('subscriptions', async () => {
-    return new Promise((good, bad) => {
-      const storedData = localStorage.getItem(props.localStorageKey);
-      if (storedData) {
-        try {
-          const storedJson = JSON.parse(storedData);
-          if (_.get(storedJson, 'payload')) {
-            good(storedJson);
-          } else {
-            // invalid local storage found return empty data set
-            good({});
-          }
-        } catch (e) {
-          bad(e);
-        }
-      }
-      // no local storage found return empty data set
-      good({});
-    }).then((data) => data);
-  });
-
-  if (status === 'loading') return <div>loading...</div>;
-
   return (
     <div className={styles.edit}>
-      <SubscriptionForm {...props} data={data} />
+      <SubscriptionForm {...props} />
     </div>
   );
 }
 
-function SubscriptionForm(_props) {
+function SubscriptionForm(props) {
+  const router = useRouter();
+  const getNewDateFormatted = () => {
+    const date = new Date().toJSON().slice(0, 10);
+    return date.replace(/-/g, '');
+  };
+  const onSubmit = async (item) => {
+    return new Promise((good) => {
+      const id = uuidv4();
+      const key = props.localStorageKey;
+      if (id) {
+        _.set(item, 'id', id);
+        _.set(item, 'created_at', getNewDateFormatted());
+        _.set(item, 'updated_at', getNewDateFormatted());
+        localStorage.setItem(`${key}-${id}`, JSON.stringify(item));
+        good(item);
+      } else {
+        good({});
+      }
+    }).then((data) => {
+      const id = data.id;
+      if (id) router.push(`/subscription/${id}`)
+    });
+  };
+
   const {
     register,
     handleSubmit,
     formState: { errors }
   } = useForm();
-
-  const onSubmit = (data) => console.log(data);
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
