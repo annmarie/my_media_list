@@ -14,6 +14,7 @@
     "@hookform/error-message": "^2.0.0",
     "cookie": "0.4.0",
     "cors": "^2.8.5",
+    "dayjs": "^1.10.7",
     "lodash": "^4.17.21",
     "next": "latest",
     "next-connect": "^0.10.2",

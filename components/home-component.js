@@ -19,15 +19,19 @@ function SubscriptionList(props) {
   const [stateData, setData] = useState(0);
   const { status } = useQuery('subscriptions', () => {
     return new Promise((good) => {
-      const payload = [];
-      for (let i = 0; i < localStorage.length; i++) {
-        const storeKey = localStorage.key(i);
-        if (storeKey.startsWith(props.localStorageKey)) {
-          payload.push(JSON.parse(localStorage.getItem(storeKey)));
+      try {
+        const payload = [];
+        for (let i = 0; i < localStorage.length; i++) {
+          const storeKey = localStorage.key(i);
+          if (storeKey.startsWith(props.localStorageKey)) {
+            payload.push(JSON.parse(localStorage.getItem(storeKey)));
+          }
         }
+        if (payload.length) good({ status: 'success', payload });
+        else good({ status: 'success' });
+      } catch (error) {
+        good({ error, status: 'fail' });
       }
-      if (payload.length) good({ status: 'success', payload });
-      else good({ status: 'success' });
     }).then((data) => {
       setData(data);
       return data;
@@ -44,6 +48,7 @@ function SubscriptionList(props) {
 }
 
 function InitButton(props) {
+  props.toggleNavOff(1);
   // initialize demo data
   const initData = async () => {
     const key = props.localStorageKey;
@@ -60,6 +65,7 @@ function InitButton(props) {
       localStorage.setItem(storeKey, JSON.stringify(item));
     });
     props.setData(demoData);
+    props.toggleNavOff(0);
   };
 
   return (
@@ -70,11 +76,15 @@ function InitButton(props) {
 }
 
 const TableData = (props) => {
-  const removeSubscriptions = (id) => {
+  const [deleteList, setDeleteList] = useState([]);
+  const removeSubscriptions = (ids) => {
     new Promise((good) => {
-      const key = props.localStorageKey;
       try {
-        localStorage.removeItem(`${key}-${id}`);
+        for (let i = 0; i < ids.length; i++) {
+          const id = ids[i];
+          const key = props.localStorageKey;
+          localStorage.removeItem(`${key}-${id}`);
+        }
         good({ status: 'success' });
       } catch (error) {
         good({ error, status: 'fail' });
@@ -84,13 +94,32 @@ const TableData = (props) => {
       const payload = [];
       const oldPayload = props.data.payload;
       for (let i = 0; i < oldPayload.length; i++) {
-        if (oldPayload[i].id !== id) {
+        if (!ids.includes(oldPayload[i].id)) {
           payload.push(oldPayload[i]);
         }
       }
       if (payload.length) props.setData({ payload });
       else props.setData({});
     });
+  };
+
+  const deleteChecked = (_e) => {
+    removeSubscriptions(deleteList);
+    setDeleteList([]);
+  };
+
+  const onCheckChange = (e) => {
+    const value = e.target.value;
+    const checked = e.currentTarget.checked;
+    const newDeleteList = [...deleteList];
+    if (checked) {
+      if (!newDeleteList.includes(value)) {
+        newDeleteList.push(value);
+        setDeleteList(newDeleteList);
+      }
+    } else {
+      setDeleteList(newDeleteList.filter((id) => id != value));
+    }
   };
 
   const displayRow = (item) => {
@@ -103,8 +132,11 @@ const TableData = (props) => {
         </td>
         <td>{item.price}</td>
         <td>{item.frequency}</td>
-        <td className="deleteCell" onClick={() => removeSubscriptions(item.id)}>
+        <td onClick={() => removeSubscriptions([item.id])}>
           <Image alt="delete" src="/svgs/delete.svg" width="30px" height="30px" />
+        </td>
+        <td>
+          <input type="checkBox" name="delete" value={item.id} onChange={onCheckChange} />
         </td>
       </tr>
     );
@@ -112,6 +144,7 @@ const TableData = (props) => {
 
   return (
     <div className={styles.home}>
+      <DeleteListButtons {...props} deleteList={deleteList} />
       <table>
         <thead>
           <tr>
@@ -119,10 +152,21 @@ const TableData = (props) => {
             <th>price</th>
             <th>frequency</th>
             <th></th>
+            <th></th>
           </tr>
         </thead>
         <tbody>{_.get(props.data, 'payload', []).map(displayRow)}</tbody>
       </table>
     </div>
   );
+
+  function DeleteListButtons(props) {
+    if (props.deleteList.length)
+      return (
+        <div className="delButton">
+          <button onClick={deleteChecked}>Delete Checked</button>
+        </div>
+      );
+    else return '';
+  }
 };

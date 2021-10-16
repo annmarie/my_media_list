@@ -15,21 +15,22 @@ export default function CreateComponent(props) {
 
 function SubscriptionForm(props) {
   const router = useRouter();
-  const getNewDateFormatted = () => {
-    const date = new Date().toJSON().slice(0, 10);
-    return date.replace(/-/g, '');
-  };
   const onSubmit = async (item) => {
     return new Promise((good) => {
-      const id = uuidv4();
-      const key = props.localStorageKey;
-      if (id) {
-        _.set(item, 'id', id);
-        _.set(item, 'created_at', getNewDateFormatted());
-        _.set(item, 'updated_at', getNewDateFormatted());
-        localStorage.setItem(`${key}-${id}`, JSON.stringify(item));
-        good(item);
-      } else {
+      try {
+        const id = uuidv4();
+        const key = props.localStorageKey;
+        if (id) {
+          _.set(item, 'id', id);
+          _.set(item, 'created_at', Date.now());
+          _.set(item, 'updated_at', Date.now());
+          localStorage.setItem(`${key}-${id}`, JSON.stringify(item));
+          good(item);
+        } else {
+          good({});
+        }
+      } catch (e) {
+        console.error(e);
         good({});
       }
     }).then((data) => {
@@ -46,24 +47,22 @@ function SubscriptionForm(props) {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      <input placeholder="name" {...register('name', { required: true })} />
+      <input size="50" placeholder="name" {...register('name', { required: true })} />
       <ErrorMessage errors={errors} name="name" render={() => <div className="error">Name is required</div>} />
       <br />
-      <input placeholder="price" {...register('price', { required: true, pattern: /^-?\d*\.?\d*$/ })} />
+      <input size="50" placeholder="price" {...register('price', { required: true, pattern: /^-?\d*\.?\d*$/ })} />
       <ErrorMessage
         errors={errors}
         name="price"
         render={() => <div className="error">Price is required and must be a number</div>}
       />
       <br />
-      <input placeholder="frequency" {...register('frequency', { required: true })} />
-      <ErrorMessage
-        errors={errors}
-        name="frequency"
-        render={() => <div className="error">Frequency is required and should be a select</div>}
-      />
+      <select size="2" {...register('frequency')}>
+        <option value="monthly">monthly</option>
+        <option value="annually">annually</option>
+      </select>
       <br />
-      <input placeholder="description" {...register('description', { required: false })} />
+      <input size="50" placeholder="description" {...register('description', { required: false })} />
       <br />
       <input type="submit" />
       <br />

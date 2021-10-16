@@ -4,10 +4,11 @@
     border-collapse: collapse;
     min-width: 100%;
     grid-template-columns:
-      minmax(100px, 2fr)
-      minmax(100px, 0.75fr)
-      minmax(100px, 1fr)
-      minmax(100px, 0.5fr)
+      minmax(50px, 1fr)
+      minmax(50px, 0.5fr)
+      minmax(50px, 0.5fr)
+      minmax(50px, 0.3fr)
+      minmax(50px, 0.3fr)
   }
 
   thead,
