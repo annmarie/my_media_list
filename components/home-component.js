@@ -26,8 +26,8 @@ function SubscriptionList(props) {
           payload.push(JSON.parse(localStorage.getItem(storeKey)));
         }
       }
-      if (payload.length) good({ payload });
-      else good({});
+      if (payload.length) good({ status: 'success', payload });
+      else good({ status: 'success' });
     }).then((data) => {
       setData(data);
       return data;
@@ -36,7 +36,11 @@ function SubscriptionList(props) {
 
   if (status === 'loading') return <div>loading...</div>;
 
-  return _.get(stateData, 'payload') ? <TableData {...stateData} /> : <InitButton {...props} setData={setData} />;
+  return _.get(stateData, 'payload') ? (
+    <TableData {...props} data={stateData} setData={setData} />
+  ) : (
+    <InitButton {...props} setData={setData} />
+  );
 }
 
 function InitButton(props) {
@@ -65,19 +69,41 @@ function InitButton(props) {
   );
 }
 
-const TableData = (subscriptions) => {
-  const displayData = (item) => {
-    const href = `/subscription/${item.id}`;
+const TableData = (props) => {
+  const removeSubscriptions = (id) => {
+    new Promise((good) => {
+      const key = props.localStorageKey;
+      try {
+        localStorage.removeItem(`${key}-${id}`);
+        good({ status: 'success' });
+      } catch (error) {
+        good({ error, status: 'fail' });
+      }
+    }).then((data) => {
+      if (_.get(data, 'error')) return console.error(data);
+      const payload = [];
+      const oldPayload = props.data.payload;
+      for (let i = 0; i < oldPayload.length; i++) {
+        if (oldPayload[i].id !== id) {
+          payload.push(oldPayload[i]);
+        }
+      }
+      if (payload.length) props.setData({ payload });
+      else props.setData({});
+    });
+  };
+
+  const displayRow = (item) => {
     return (
       <tr key={item.id} id={item.id}>
         <td>
-          <Link href={href}>
+          <Link href={`/subscription/${item.id}`}>
             <a>{item.name}</a>
           </Link>
         </td>
         <td>{item.price}</td>
         <td>{item.frequency}</td>
-        <td>
+        <td className="deleteCell" onClick={() => removeSubscriptions(item.id)}>
           <Image alt="delete" src="/svgs/delete.svg" width="30px" height="30px" />
         </td>
       </tr>
@@ -95,7 +121,7 @@ const TableData = (subscriptions) => {
             <th></th>
           </tr>
         </thead>
-        <tbody>{_.get(subscriptions, 'payload', []).map(displayData)}</tbody>
+        <tbody>{_.get(props.data, 'payload', []).map(displayRow)}</tbody>
       </table>
     </div>
   );

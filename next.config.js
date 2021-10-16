@@ -12,11 +12,11 @@ module.exports = (phase, { defaultConfig }) => {
         fallback: [
           {
             source: '/subscription/:id',
-            destination: '/',
+            destination: '/'
           },
           {
             source: '/subscription',
-            destination: '/',
+            destination: '/'
           },
           {
             source: '/',
