@@ -5,7 +5,6 @@ import styles from 'styles/components/Edit.module.scss';
 import { useState } from 'react';
 import { QueryClient, QueryClientProvider, useQuery } from 'react-query';
 
-
 export default function EditComponent(props) {
   const queryClient = new QueryClient();
 
@@ -27,7 +26,7 @@ function SubscriptionEdit(props) {
       const storedData = localStorage.getItem(`${key}-${id}`);
       good(JSON.parse(storedData));
     }).then((data) => {
-      setData(data)
+      setData(data);
       return data;
     });
   });
@@ -104,5 +103,3 @@ function SubscriptionForm(props) {
     </form>
   );
 }
-
-

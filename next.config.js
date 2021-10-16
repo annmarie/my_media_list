@@ -11,7 +11,15 @@ module.exports = (phase, { defaultConfig }) => {
       return {
         fallback: [
           {
-            source: '/:path*',
+            source: '/subscription/:id',
+            destination: '/',
+          },
+          {
+            source: '/subscription',
+            destination: '/',
+          },
+          {
+            source: '/',
             destination: '/'
           }
         ]

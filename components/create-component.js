@@ -3,8 +3,7 @@ import { useForm } from 'react-hook-form';
 import { ErrorMessage } from '@hookform/error-message';
 import { v4 as uuidv4 } from 'uuid';
 import styles from 'styles/components/Create.module.scss';
-import { useRouter } from 'next/router'
-
+import { useRouter } from 'next/router';
 
 export default function CreateComponent(props) {
   return (
@@ -35,7 +34,7 @@ function SubscriptionForm(props) {
       }
     }).then((data) => {
       const id = data.id;
-      if (id) router.push(`/subscription/${id}`)
+      if (id) router.push(`/subscription/${id}`);
     });
   };
 

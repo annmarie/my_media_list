@@ -17,8 +17,8 @@ export default function HomeComponent(props) {
 
 function SubscriptionList(props) {
   const [stateData, setData] = useState(0);
-  const { status, data } = useQuery('subscriptions', () => {
-    return new Promise((good, bad) => {
+  const { status } = useQuery('subscriptions', () => {
+    return new Promise((good) => {
       const payload = [];
       for (let i = 0; i < localStorage.length; i++) {
         const storeKey = localStorage.key(i);
