@@ -75,7 +75,7 @@ function SubscriptionForm(props) {
             console.error(e);
             good(props.item);
           }
-        }, 8000)
+        }, 8000);
       }).then((data) => props.setItem(data));
     }
   };
