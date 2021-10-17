@@ -6,7 +6,7 @@ const appConfig = {
     { title: 'Administration', path: '/' },
     { title: 'Creation', path: '/subscription' }
   ],
-  localStorageKey: 'my-media-list-v2'
+  localStorageKey: 'my-media-list'
 };
 
 export default appConfig;

@@ -1,7 +1,10 @@
 import { useRouter } from 'next/router';
+import { useState } from 'react';
 import HomeComponent from './home-component';
 import EditComponent from './edit-component';
 import CreateComponent from './create-component';
+import NavigationComponent from 'components/navigation-component';
+
 
 export default function PageComponent(props) {
   const router = useRouter();
@@ -9,10 +12,26 @@ export default function PageComponent(props) {
 
   switch (true) {
     case /\/subscription\/[^\/]*/.test(asPath):
-      return <EditComponent id={asPath.replace('/subscription/', '')} {...props} />;
+      const id= asPath.replace('/subscription/', '');
+      return (
+        <>
+          <NavigationComponent {...props} />
+          <EditComponent id={id} {...props} />
+        </>
+      );
     case /\/subscription/.test(asPath):
-      return <CreateComponent {...props} />;
+      return (
+        <>
+          <NavigationComponent {...props} />
+          <CreateComponent {...props} />
+        </>
+      );
     default:
-      return <HomeComponent {...props} />;
+      return (
+        <>
+          <NavigationComponent {...props} />
+          <HomeComponent {...props} />
+        </>
+      );
   }
 }

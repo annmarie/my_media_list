@@ -48,11 +48,17 @@ function SubscriptionList(props) {
 }
 
 function InitButton(props) {
-  props.toggleNavOff(1);
   // initialize demo data
   const initData = async () => {
-    const key = props.localStorageKey;
     let demoData = {};
+    const key = props.localStorageKey;
+    // remove old kys 
+    for (let i = 0; i < localStorage.length; i++) {
+      const storeKey = localStorage.key(i);
+      if (storeKey.startsWith(props.localStorageKey)) {
+        localStorage.removeItem(storeKey); 
+      }
+    }
     try {
       const rset = await fetch('/api/data');
       demoData = await rset.json();
@@ -65,7 +71,6 @@ function InitButton(props) {
       localStorage.setItem(storeKey, JSON.stringify(item));
     });
     props.setData(demoData);
-    props.toggleNavOff(0);
   };
 
   return (
