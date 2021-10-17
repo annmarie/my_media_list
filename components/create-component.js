@@ -34,7 +34,7 @@ function SubscriptionForm(props) {
           console.error(e);
           good({});
         }
-      }, 8000);
+      }, 0);
     }).then((data) => {
       const id = data.id;
       if (id) router.push(`/subscription/${id}`);

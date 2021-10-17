@@ -33,7 +33,7 @@ function SubscriptionList(props) {
         } catch (error) {
           good({ error, status: 'fail' });
         }
-      }, 800);
+      }, 0);
     }).then((data) => {
       setData(data);
       return data;
