@@ -46,33 +46,37 @@ function SubscriptionEdit(props) {
 
 function SubscriptionForm(props) {
   const onSubmit = async (item, oldItem) => {
-    const testKeys = ['name', 'frequency', 'price', 'description'];
-    if ((item, _.pick(oldItem, testKeys))) {
+    // parse input values
+    _.set(item, 'price', parseFloat(_.get(item, 'price', 0)));
+    // do we have anything to update?
+    const keys = ['name', 'frequency', 'price', 'description'];
+    if (_.isEqual(_.pick(item, keys), _.pick(oldItem, keys))) {
       // I feel like I'm adding a blink tag to html
       // Don't judge me for this next line.
       // I'm just being lazy. ;)
       alert('nothing to update');
       return '';
+      // We have things to update!
     } else {
-      // parse input values
-      _.set(item, 'price', parseFloat(_.get(item, 'price', 0)));
       return new Promise((good) => {
-        try {
-          const id = props.id;
-          const key = props.localStorageKey;
-          if (id) {
-            _.set(item, 'id', id);
-            _.set(item, 'created_at', props.item.created_at);
-            _.set(item, 'updated_at', Date.now());
-            localStorage.setItem(`${key}-${id}`, JSON.stringify(item));
-            good(item);
-          } else {
+        setTimeout(() => {
+          try {
+            const id = props.id;
+            const key = props.localStorageKey;
+            if (id) {
+              _.set(item, 'id', id);
+              _.set(item, 'created_at', props.item.created_at);
+              _.set(item, 'updated_at', Date.now());
+              localStorage.setItem(`${key}-${id}`, JSON.stringify(item));
+              good(item);
+            } else {
+              good(props.item);
+            }
+          } catch (e) {
+            console.error(e);
             good(props.item);
           }
-        } catch (e) {
-          console.error(e);
-          good(props.item);
-        }
+        }, 8000)
       }).then((data) => props.setItem(data));
     }
   };
