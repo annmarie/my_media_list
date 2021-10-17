@@ -57,7 +57,7 @@ function SubscriptionForm(props) {
         render={() => <div className="error">Price is required and must be a number</div>}
       />
       <br />
-      <select size="2" {...register('frequency')}>
+      <select size="2" {...register('frequency')} defaultValue={'monthly'}>
         <option value="monthly">monthly</option>
         <option value="annually">annually</option>
       </select>

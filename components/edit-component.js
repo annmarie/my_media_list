@@ -46,11 +46,13 @@ function SubscriptionEdit(props) {
 
 function SubscriptionForm(props) {
   const onSubmit = async (item, oldItem) => {
+    // parse input values
+    _.set(item, 'price', parseFloat(_.get(item, 'price', 0)));
     console.log(item, oldItem);
     const testKeys = ['name', 'frequency', 'price', 'description'];
     if (_.isEqual(_.pick(item, testKeys), _.pick(oldItem, testKeys))) {
       alert('nothing to update');
-      return new Promise();
+      return '';
     } else {
       return new Promise((good) => {
         try {
