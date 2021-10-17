@@ -55,26 +55,27 @@ function SubscriptionForm(props) {
       // I'm just being lazy. ;)
       alert('nothing to update');
       return '';
+      // We have things to update!
     } else {
-      // parse input values
-      _.set(item, 'price', parseFloat(_.get(item, 'price', 0)));
       return new Promise((good) => {
-        try {
-          const id = props.id;
-          const key = props.localStorageKey;
-          if (id) {
-            _.set(item, 'id', id);
-            _.set(item, 'created_at', props.item.created_at);
-            _.set(item, 'updated_at', Date.now());
-            localStorage.setItem(`${key}-${id}`, JSON.stringify(item));
-            good(item);
-          } else {
+        setTimeout(() => {
+          try {
+            const id = props.id;
+            const key = props.localStorageKey;
+            if (id) {
+              _.set(item, 'id', id);
+              _.set(item, 'created_at', props.item.created_at);
+              _.set(item, 'updated_at', Date.now());
+              localStorage.setItem(`${key}-${id}`, JSON.stringify(item));
+              good(item);
+            } else {
+              good(props.item);
+            }
+          } catch (e) {
+            console.error(e);
             good(props.item);
           }
-        } catch (e) {
-          console.error(e);
-          good(props.item);
-        }
+        }, 8000)
       }).then((data) => props.setItem(data));
     }
   };
