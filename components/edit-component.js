@@ -46,14 +46,16 @@ function SubscriptionEdit(props) {
 
 function SubscriptionForm(props) {
   const onSubmit = async (item, oldItem) => {
-    // parse input values
-    _.set(item, 'price', parseFloat(_.get(item, 'price', 0)));
-    console.log(item, oldItem);
     const testKeys = ['name', 'frequency', 'price', 'description'];
-    if (_.isEqual(_.pick(item, testKeys), _.pick(oldItem, testKeys))) {
+    if ((item, _.pick(oldItem, testKeys))) {
+      // I feel like I'm adding a blink tag to html
+      // Don't judge me for this next line.
+      // I'm just being lazy. ;)
       alert('nothing to update');
       return '';
     } else {
+      // parse input values
+      _.set(item, 'price', parseFloat(_.get(item, 'price', 0)));
       return new Promise((good) => {
         try {
           const id = props.id;
