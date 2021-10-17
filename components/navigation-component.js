@@ -22,7 +22,9 @@ export default function NavigationComponent(props) {
     );
   };
 
-  return <nav className={styles.navigation}>
+  return (
+    <nav className={styles.navigation}>
       <ul>{props.navLinks.map(makeNavLink)}</ul>
     </nav>
+  );
 }
