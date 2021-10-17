@@ -45,30 +45,32 @@ function SubscriptionEdit(props) {
 }
 
 function SubscriptionForm(props) {
-  const onSubmit = async (item) => {
+  const onSubmit = async (item, oldItem) => {
+    console.log(item, oldItem);
     const testKeys = ['name', 'frequency', 'price', 'description'];
-    if (_.isEqual(_.pick(item, testKeys), _.pick(props.item, testKeys))) {
+    if (_.isEqual(_.pick(item, testKeys), _.pick(oldItem, testKeys))) {
       alert('nothing to update');
-      return;
-    }
-    return new Promise((good) => {
-      try {
-        const id = props.id;
-        const key = props.localStorageKey;
-        if (id) {
-          _.set(item, 'id', id);
-          _.set(item, 'created_at', props.item.created_at);
-          _.set(item, 'updated_at', Date.now());
-          localStorage.setItem(`${key}-${id}`, JSON.stringify(item));
-          good(item);
-        } else {
+      return new Promise();
+    } else {
+      return new Promise((good) => {
+        try {
+          const id = props.id;
+          const key = props.localStorageKey;
+          if (id) {
+            _.set(item, 'id', id);
+            _.set(item, 'created_at', props.item.created_at);
+            _.set(item, 'updated_at', Date.now());
+            localStorage.setItem(`${key}-${id}`, JSON.stringify(item));
+            good(item);
+          } else {
+            good(props.item);
+          }
+        } catch (e) {
+          console.error(e);
           good(props.item);
         }
-      } catch (e) {
-        console.error(e);
-        good(props.item);
-      }
-    }).then((data) => props.setItem(data));
+      }).then((data) => props.setItem(data));
+    }
   };
 
   const {
@@ -77,10 +79,11 @@ function SubscriptionForm(props) {
     formState: { errors }
   } = useForm();
 
-  const { name, price, frequency, description, updated_at, created_at } = props.item || {};
+  const origItem = props.item || {};
+  const { name, price, frequency, description, updated_at, created_at } = origItem; 
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
+    <form onSubmit={handleSubmit((item) => onSubmit(item, origItem))}>
       <input size="50" placeholder="name" {...register('name', { required: true })} defaultValue={name} />
       <ErrorMessage errors={errors} name="name" render={() => <div className="error">Name is required</div>} />
       <br />

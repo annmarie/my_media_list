@@ -22,11 +22,7 @@ export default function NavigationComponent(props) {
     );
   };
 
-  return props.navOff ? (
-    ''
-  ) : (
-    <nav className={styles.navigation}>
+  return <nav className={styles.navigation}>
       <ul>{props.navLinks.map(makeNavLink)}</ul>
     </nav>
-  );
 }
