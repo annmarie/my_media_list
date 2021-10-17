@@ -52,11 +52,11 @@ function InitButton(props) {
   const initData = async () => {
     let demoData = {};
     const key = props.localStorageKey;
-    // remove old kys 
+    // remove old kys
     for (let i = 0; i < localStorage.length; i++) {
       const storeKey = localStorage.key(i);
       if (storeKey.startsWith(props.localStorageKey)) {
-        localStorage.removeItem(storeKey); 
+        localStorage.removeItem(storeKey);
       }
     }
     try {

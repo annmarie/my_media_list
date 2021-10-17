@@ -6,7 +6,6 @@ import FooterComponent from 'components/footer-component';
 import PageComponent from 'components/page-component';
 
 export default function Index(props) {
-
   return (
     <>
       <Head>

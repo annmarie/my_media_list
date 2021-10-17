@@ -80,7 +80,7 @@ function SubscriptionForm(props) {
   } = useForm();
 
   const origItem = props.item || {};
-  const { name, price, frequency, description, updated_at, created_at } = origItem; 
+  const { name, price, frequency, description, updated_at, created_at } = origItem;
 
   return (
     <form onSubmit={handleSubmit((item) => onSubmit(item, origItem))}>
