@@ -19,19 +19,21 @@ function SubscriptionList(props) {
   const [stateData, setData] = useState(0);
   const { status } = useQuery('subscriptions', () => {
     return new Promise((good) => {
-      try {
-        const payload = [];
-        for (let i = 0; i < localStorage.length; i++) {
-          const storeKey = localStorage.key(i);
-          if (storeKey.startsWith(props.localStorageKey)) {
-            payload.push(JSON.parse(localStorage.getItem(storeKey)));
+      setTimeout(() => {
+        try {
+          const payload = [];
+          for (let i = 0; i < localStorage.length; i++) {
+            const storeKey = localStorage.key(i);
+            if (storeKey.startsWith(props.localStorageKey)) {
+              payload.push(JSON.parse(localStorage.getItem(storeKey)));
+            }
           }
+          if (payload.length) good({ status: 'success', payload });
+          else good({ status: 'success' });
+        } catch (error) {
+          good({ error, status: 'fail' });
         }
-        if (payload.length) good({ status: 'success', payload });
-        else good({ status: 'success' });
-      } catch (error) {
-        good({ error, status: 'fail' });
-      }
+      }, 8000)
     }).then((data) => {
       setData(data);
       return data;

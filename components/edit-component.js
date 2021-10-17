@@ -46,8 +46,10 @@ function SubscriptionEdit(props) {
 
 function SubscriptionForm(props) {
   const onSubmit = async (item, oldItem) => {
-    const testKeys = ['name', 'frequency', 'price', 'description'];
-    if ((item, _.pick(oldItem, testKeys))) {
+    // parse input values
+    _.set(item, 'price', parseFloat(_.get(item, 'price', 0)));
+    const keys = ['name', 'frequency', 'price', 'description'];
+    if (_.isEqual(_.pick(item, keys), _.pick(oldItem, keys))) {
       // I feel like I'm adding a blink tag to html
       // Don't judge me for this next line.
       // I'm just being lazy. ;)

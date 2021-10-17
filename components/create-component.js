@@ -17,22 +17,24 @@ function SubscriptionForm(props) {
   const router = useRouter();
   const onSubmit = async (item) => {
     return new Promise((good) => {
-      try {
-        const id = uuidv4();
-        const key = props.localStorageKey;
-        if (id) {
-          _.set(item, 'id', id);
-          _.set(item, 'created_at', Date.now());
-          _.set(item, 'updated_at', Date.now());
-          localStorage.setItem(`${key}-${id}`, JSON.stringify(item));
-          good(item);
-        } else {
+      setTimeout(() => {
+        try {
+          const id = uuidv4();
+          const key = props.localStorageKey;
+          if (id) {
+            _.set(item, 'id', id);
+            _.set(item, 'created_at', Date.now());
+            _.set(item, 'updated_at', Date.now());
+            localStorage.setItem(`${key}-${id}`, JSON.stringify(item));
+            good(item);
+          } else {
+            good({});
+          }
+        } catch (e) {
+          console.error(e);
           good({});
         }
-      } catch (e) {
-        console.error(e);
-        good({});
-      }
+      }, 8000)
     }).then((data) => {
       const id = data.id;
       if (id) router.push(`/subscription/${id}`);
