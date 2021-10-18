@@ -8,12 +8,12 @@ import { saveItem } from 'provider/localStorage';
 export default function CreateComponent(props) {
   return (
     <div className={styles.edit}>
-      <SubscriptionForm {...props} />
+      <SubscriptionCreate {...props} />
     </div>
   );
 }
 
-function SubscriptionForm(props) {
+function SubscriptionCreate(props) {
   const router = useRouter();
   const onSubmit = async (item) => {
     // parse input values
@@ -24,14 +24,14 @@ function SubscriptionForm(props) {
     });
   };
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors }
-  } = useForm();
+  return <SaveForm {...props} onSubmit={onSubmit} />;
+}
+
+function SaveForm(props) {
+  const { register, handleSubmit, formState: { errors } } = useForm();
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
+    <form onSubmit={handleSubmit(props.onSubmit)}>
       <input size="50" placeholder="name" {...register('name', { required: true })} />
       <ErrorMessage errors={errors} name="name" render={() => <div className="error">Name is required</div>} />
       <br />

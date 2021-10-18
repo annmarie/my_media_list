@@ -113,7 +113,7 @@ export function updateItem(props, item) {
         const key = props.localStorageKey;
         if (id) {
           _.set(item, 'id', id);
-          _.set(item, 'created_at', props.item.created_at);
+          _.set(item, 'created_at', item.created_at);
           _.set(item, 'updated_at', Date.now());
           localStorage.setItem(`${key}-${id}`, JSON.stringify(item));
           good(item);
