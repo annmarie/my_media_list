@@ -28,7 +28,11 @@ function SubscriptionCreate(props) {
 }
 
 function SaveForm(props) {
-  const { register, handleSubmit, formState: { errors } } = useForm();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors }
+  } = useForm();
 
   return (
     <form onSubmit={handleSubmit(props.onSubmit)}>

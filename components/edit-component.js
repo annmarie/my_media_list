@@ -51,7 +51,11 @@ function SubscriptionEdit(props) {
 }
 
 function UpdateForm(props) {
-  const { register, handleSubmit, formState: { errors } } = useForm();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors }
+  } = useForm();
 
   const { name, price, frequency, description, updated_at, created_at } = props.item || {};
 
@@ -65,11 +69,13 @@ function UpdateForm(props) {
           size="50"
           placeholder="price"
           {...register('price', { required: true, pattern: /^-?\d*\.?\d*$/ })}
-          defaultValue={price} />
+          defaultValue={price}
+        />
         <ErrorMessage
           errors={errors}
           name="price"
-          render={() => <div className="error">Price is required and must be a number</div>} />
+          render={() => <div className="error">Price is required and must be a number</div>}
+        />
         <br />
         <select size="2" {...register('frequency')} defaultValue={frequency}>
           <option value="monthly">monthly</option>
@@ -80,7 +86,8 @@ function UpdateForm(props) {
           size="50"
           placeholder="description"
           {...register('description', { required: false })}
-          defaultValue={description} />
+          defaultValue={description}
+        />
         <br />
         <input type="submit" value="edit subscription" />
         <br />

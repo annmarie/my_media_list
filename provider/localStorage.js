@@ -164,4 +164,4 @@ export function saveItem(props, item) {
   });
 }
 
-export default { initData, getData, deleteData, getItem, saveItem }
+export default { initData, getData, deleteData, getItem, saveItem };
