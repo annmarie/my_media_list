@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import { v4 as uuidv4 } from 'uuid';
 
 const priceFormatter = new Intl.NumberFormat('en-US', {
   style: 'currency',
@@ -108,3 +109,62 @@ export const deleteData = async (ids, props) => {
     }
   });
 };
+
+export function updateItem(props, item) {
+  return new Promise((good) => {
+    setTimeout(() => {
+      try {
+        const id = props.id;
+        const key = props.localStorageKey;
+        if (id) {
+          _.set(item, 'id', id);
+          _.set(item, 'created_at', props.item.created_at);
+          _.set(item, 'updated_at', Date.now());
+          localStorage.setItem(`${key}-${id}`, JSON.stringify(item));
+          good(item);
+        } else {
+          good(props.item);
+        }
+      } catch (e) {
+        console.error(e);
+        good(props.item);
+      }
+    }, 100);
+  });
+}
+
+export function getItem(props) {
+  return new Promise((good) => {
+    try {
+      const id = _.get(props, 'id', 0);
+      const key = props.localStorageKey;
+      const storedData = localStorage.getItem(`${key}-${id}`);
+      good(JSON.parse(storedData));
+    } catch (error) {
+      good({ error, status: 'fail' });
+    }
+  });
+}
+
+export function saveItem(props, item) {
+  return new Promise((good) => {
+    setTimeout(() => {
+      try {
+        const id = uuidv4();
+        const key = props.localStorageKey;
+        if (id) {
+          _.set(item, 'id', id);
+          _.set(item, 'created_at', Date.now());
+          _.set(item, 'updated_at', Date.now());
+          localStorage.setItem(`${key}-${id}`, JSON.stringify(item));
+          good(item);
+        } else {
+          good({});
+        }
+      } catch (e) {
+        console.error(e);
+        good({});
+      }
+    }, 100);
+  });
+}

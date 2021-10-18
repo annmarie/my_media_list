@@ -1,9 +1,9 @@
 import _ from 'lodash';
 import { useForm } from 'react-hook-form';
 import { ErrorMessage } from '@hookform/error-message';
-import { v4 as uuidv4 } from 'uuid';
 import styles from 'styles/components/Create.module.scss';
 import { useRouter } from 'next/router';
+import { saveItem } from 'provider/localStorage';
 
 export default function CreateComponent(props) {
   return (
@@ -18,26 +18,7 @@ function SubscriptionForm(props) {
   const onSubmit = async (item) => {
     // parse input values
     _.set(item, 'price', parseFloat(_.get(item, 'price', 0)));
-    return new Promise((good) => {
-      setTimeout(() => {
-        try {
-          const id = uuidv4();
-          const key = props.localStorageKey;
-          if (id) {
-            _.set(item, 'id', id);
-            _.set(item, 'created_at', Date.now());
-            _.set(item, 'updated_at', Date.now());
-            localStorage.setItem(`${key}-${id}`, JSON.stringify(item));
-            good(item);
-          } else {
-            good({});
-          }
-        } catch (e) {
-          console.error(e);
-          good({});
-        }
-      }, 100);
-    }).then((data) => {
+    return saveItem(props, item).then((data) => {
       const id = data.id;
       if (id) router.push(`/subscription/${id}`);
     });

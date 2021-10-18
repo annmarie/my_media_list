@@ -5,6 +5,7 @@ import styles from 'styles/components/Edit.module.scss';
 import { useState } from 'react';
 import { QueryClient, QueryClientProvider, useQuery } from 'react-query';
 import dayjs from 'dayjs';
+import { getItem, updateItem } from 'provider/localStorage';
 
 export default function EditComponent(props) {
   const queryClient = new QueryClient();
@@ -21,16 +22,7 @@ export default function EditComponent(props) {
 function SubscriptionEdit(props) {
   const [stateData, setData] = useState(0);
   const { status } = useQuery('subscription', async () => {
-    return new Promise((good) => {
-      try {
-        const id = _.get(props, 'id', 0);
-        const key = props.localStorageKey;
-        const storedData = localStorage.getItem(`${key}-${id}`);
-        good(JSON.parse(storedData));
-      } catch (error) {
-        good({ error, status: 'fail' });
-      }
-    }).then((data) => {
+    return getItem(props).then((data) => {
       setData(data);
       return data;
     });
@@ -58,26 +50,7 @@ function SubscriptionForm(props) {
       return '';
       // We have things to update!
     } else {
-      return new Promise((good) => {
-        setTimeout(() => {
-          try {
-            const id = props.id;
-            const key = props.localStorageKey;
-            if (id) {
-              _.set(item, 'id', id);
-              _.set(item, 'created_at', props.item.created_at);
-              _.set(item, 'updated_at', Date.now());
-              localStorage.setItem(`${key}-${id}`, JSON.stringify(item));
-              good(item);
-            } else {
-              good(props.item);
-            }
-          } catch (e) {
-            console.error(e);
-            good(props.item);
-          }
-        }, 100);
-      }).then((data) => props.setItem(data));
+      return updateItem(props, item).then((data) => props.setItem(data));
     }
   };
 
