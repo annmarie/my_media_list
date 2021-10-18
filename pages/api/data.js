@@ -8,8 +8,8 @@ const payload = [
     price: 2.5,
     frequency: 'monthly',
     description: 'podcast',
-    created_at: '1634507876703',
-    updated_at: '1634507876703'
+    created_at: 1634516456397,
+    updated_at: 1634516456397
   },
   {
     id: uuidv4(),
@@ -17,8 +17,8 @@ const payload = [
     price: 2.5,
     frequency: 'monthly',
     description: 'podcast',
-    created_at: '1634507876703',
-    updated_at: '1634507876703'
+    created_at: 1634516456397,
+    updated_at: 1634516446397
   },
   {
     id: uuidv4(),
@@ -26,8 +26,8 @@ const payload = [
     price: 2.5,
     frequency: 'annually',
     description: 'streaming',
-    created_at: '1634507876703',
-    updated_at: '1634507876703'
+    created_at: 1634516456397,
+    updated_at: 1634516426397
   },
   {
     id: uuidv4(),
@@ -35,8 +35,8 @@ const payload = [
     price: 2.5,
     frequency: 'annually',
     description: 'application',
-    created_at: '1634507876703',
-    updated_at: '1634507876703'
+    created_at: 1634516456397,
+    updated_at: 1634516426397
   }
 ];
 

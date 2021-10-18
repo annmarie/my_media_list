@@ -4,6 +4,7 @@ import { ErrorMessage } from '@hookform/error-message';
 import styles from 'styles/components/Edit.module.scss';
 import { useState } from 'react';
 import { QueryClient, QueryClientProvider, useQuery } from 'react-query';
+import dayjs from 'dayjs';
 
 export default function EditComponent(props) {
   const queryClient = new QueryClient();
@@ -121,8 +122,8 @@ function SubscriptionForm(props) {
       <input type="submit" />
       <br />
       <ul>
-        <li key="1">updated at: {updated_at}</li>
-        <li key="2">created at: {created_at}</li>
+        <li key="1">updated at: {dayjs(updated_at).format('MM/DD/YYYY HH:mm:ss')}</li>
+        <li key="2">created at: {dayjs(created_at).format('MM/DD/YYYY HH:mm:ss')}</li>
       </ul>
     </form>
   );
