@@ -16,6 +16,8 @@ export default function CreateComponent(props) {
 function SubscriptionForm(props) {
   const router = useRouter();
   const onSubmit = async (item) => {
+    // parse input values
+    _.set(item, 'price', parseFloat(_.get(item, 'price', 0)));
     return new Promise((good) => {
       setTimeout(() => {
         try {
@@ -34,7 +36,7 @@ function SubscriptionForm(props) {
           console.error(e);
           good({});
         }
-      }, 0);
+      }, 100);
     }).then((data) => {
       const id = data.id;
       if (id) router.push(`/subscription/${id}`);

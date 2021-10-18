@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import { useRouter } from 'next/router';
 import HomeComponent from './home-component';
 import EditComponent from './edit-component';
@@ -6,7 +7,7 @@ import NavigationComponent from 'components/navigation-component';
 
 export default function PageComponent(props) {
   const router = useRouter();
-  const asPath = router.asPath;
+  const [asPath] = _.get(router, 'asPath', '/').split('?');
 
   switch (true) {
     case /\/subscription\/[^\/]*/.test(asPath):

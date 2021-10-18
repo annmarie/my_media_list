@@ -1,36 +1,66 @@
 import _ from 'lodash';
 import Link from 'next/link';
 import Image from 'next/image';
-import styles from 'styles/components/Home.module.scss';
 import { useState } from 'react';
 import { QueryClient, QueryClientProvider, useQuery } from 'react-query';
+import styles from 'styles/components/Home.module.scss';
+import { useRouter } from 'next/router';
+const priceFormatter = new Intl.NumberFormat('en-US', {
+  style: 'currency',
+  currency: 'USD'
+});
+const getFrequencyTotals = (key, payload) => {
+  return payload.reduce((total, item) => {
+    let price = 0;
+    if (item.frequency === key.toLowerCase()) {
+      price = _.get(item, 'price', 0);
+    }
+    return total + price;
+  }, 0);
+};
 
 export default function HomeComponent(props) {
   const queryClient = new QueryClient();
+  const router = useRouter();
+  const { page } = router.query;
+  const pageNum = parseInt(page) || 1;
+  const offset = (pageNum - 1) * props.pageLimit;
 
   return (
     <QueryClientProvider client={queryClient}>
-      <SubscriptionList {...props} />
+      <SubscriptionList {...props} page={pageNum} offset={offset} />
     </QueryClientProvider>
   );
 }
 
 function SubscriptionList(props) {
   const [stateData, setData] = useState(0);
-  const { status } = useQuery('subscriptions', () => {
+  const { status } = useQuery('subscriptions', async () => {
     return new Promise((good) => {
       setTimeout(() => {
         try {
           const payload = [];
+          const totals = {};
           for (let i = 0; i < localStorage.length; i++) {
             const storeKey = localStorage.key(i);
             if (storeKey.startsWith(props.localStorageKey)) {
               payload.push(JSON.parse(localStorage.getItem(storeKey)));
             }
           }
-          if (payload.length) good({ status: 'success', payload });
-          else good({ status: 'success' });
+          if (payload.length) {
+            const monthly = priceFormatter.format(getFrequencyTotals('monthly', payload));
+            const yearly = priceFormatter.format(getFrequencyTotals('yearly', payload));
+            _.set(totals, 'monthly', monthly, 0);
+            _.set(totals, 'yearly', yearly, 0);
+            _.set(totals, 'subscriptions', payload.length, 0);
+            _.set(totals, 'pages', Math.ceil(payload.length / props.pageLimit));
+            // set data results
+            good({ status: 'success', payload, totals });
+          } else {
+            good({ status: 'success' });
+          }
         } catch (error) {
+          console.error(error);
           good({ error, status: 'fail' });
         }
       }, 0);
@@ -43,7 +73,10 @@ function SubscriptionList(props) {
   if (status === 'loading') return <div>loading...</div>;
 
   return _.get(stateData, 'payload') ? (
-    <TableData {...props} data={stateData} setData={setData} />
+    <>
+      <TableData {...props} data={stateData} setData={setData} />
+      <Totals {...props} data={stateData} />
+    </>
   ) : (
     <InitButton {...props} setData={setData} />
   );
@@ -64,15 +97,24 @@ function InitButton(props) {
     try {
       const rset = await fetch('/api/data');
       demoData = await rset.json();
-    } catch (err) {
-      console.log('data not found');
-      console.log(err);
+    } catch (error) {
+      console.error('data not found');
+      console.error(error);
     }
-    _.get(demoData, 'payload', []).forEach((item) => {
+    const payload = _.get(demoData, 'payload', []);
+    const totals = {};
+    payload.forEach((item) => {
       const storeKey = `${key}-${item.id}`;
       localStorage.setItem(storeKey, JSON.stringify(item));
     });
-    props.setData(demoData);
+    const monthly = priceFormatter.format(getFrequencyTotals('monthly', payload));
+    const yearly = priceFormatter.format(getFrequencyTotals('yearly', payload));
+    _.set(totals, 'monthly', monthly, 0);
+    _.set(totals, 'yearly', yearly, 0);
+    _.set(totals, 'subscriptions', payload.length, 0);
+    _.set(totals, 'pages', Math.ceil(payload.length / props.pageLimit));
+
+    props.setData({ payload, totals });
   };
 
   return (
@@ -82,7 +124,23 @@ function InitButton(props) {
   );
 }
 
-const TableData = (props) => {
+function Totals(props) {
+  const { totals } = { ...props.data };
+
+  return totals ? (
+    <div className={styles.totals}>
+      <ul>
+        <li>monthly subscription cost: {totals.monthly}</li>
+        <li>yearly subscription cost: {totals.yearly}</li>
+        <li>total number of subscriptions: {totals.subscriptions}</li>
+      </ul>
+    </div>
+  ) : (
+    ''
+  );
+}
+
+function TableData(props) {
   const [deleteList, setDeleteList] = useState([]);
   const removeSubscriptions = (ids) => {
     new Promise((good) => {
@@ -99,14 +157,25 @@ const TableData = (props) => {
     }).then((data) => {
       if (_.get(data, 'error')) return console.error(data);
       const payload = [];
+      const totals = {};
       const oldPayload = props.data.payload;
       for (let i = 0; i < oldPayload.length; i++) {
         if (!ids.includes(oldPayload[i].id)) {
           payload.push(oldPayload[i]);
         }
       }
-      if (payload.length) props.setData({ payload });
-      else props.setData({});
+      if (payload.length) {
+        const monthly = priceFormatter.format(getFrequencyTotals('monthly', payload));
+        const yearly = priceFormatter.format(getFrequencyTotals('yearly', payload));
+        _.set(totals, 'monthly', monthly, 0);
+        _.set(totals, 'yearly', yearly, 0);
+        _.set(totals, 'subscriptions', payload.length, 0);
+        _.set(totals, 'pages', Math.ceil(payload.length / props.pageLimit));
+        // set data results
+        props.setData({ payload, totals });
+      } else {
+        props.setData({});
+      }
     });
   };
 
@@ -137,7 +206,7 @@ const TableData = (props) => {
             <a>{item.name}</a>
           </Link>
         </td>
-        <td>{item.price}</td>
+        <td>{priceFormatter.format(item.price)}</td>
         <td>{item.frequency}</td>
         <td onClick={() => removeSubscriptions([item.id])}>
           <Image alt="delete" src="/svgs/delete.svg" width="30px" height="30px" />
@@ -149,8 +218,44 @@ const TableData = (props) => {
     );
   };
 
+  const DeleteListButtons = (props) => {
+    if (props.deleteList.length)
+      return (
+        <div className="delButton">
+          <button onClick={deleteChecked}>Delete Checked</button>
+        </div>
+      );
+    else return '';
+  };
+
+  const PrevNext = (props) => {
+    const page = props.page;
+    const { pages } = { ...props.data.totals };
+    const pageLink = (page, text) => {
+      const href = `/?page=${page}`;
+      return (
+        <>
+          <Link href={href}>
+            <a>{text}</a>
+          </Link>
+        </>
+      );
+    };
+
+    return pages > 1 ? (
+      <span>
+        {page > 1 ? pageLink(page - 1, 'prev') : 'prev'}
+        {' | '}
+        {page < pages ? pageLink(page + 1, 'next') : 'next'}
+      </span>
+    ) : (
+      ''
+    );
+  };
+
   return (
     <div className={styles.home}>
+      <PrevNext {...props} />
       <DeleteListButtons {...props} deleteList={deleteList} />
       <table>
         <thead>
@@ -162,18 +267,12 @@ const TableData = (props) => {
             <th></th>
           </tr>
         </thead>
-        <tbody>{_.get(props.data, 'payload', []).map(displayRow)}</tbody>
+        <tbody>
+          {_.get(props.data, 'payload', [])
+            .slice(props.offset, props.offset + props.pageLimit)
+            .map(displayRow)}
+        </tbody>
       </table>
     </div>
   );
-
-  function DeleteListButtons(props) {
-    if (props.deleteList.length)
-      return (
-        <div className="delButton">
-          <button onClick={deleteChecked}>Delete Checked</button>
-        </div>
-      );
-    else return '';
-  }
-};
+}

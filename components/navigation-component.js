@@ -6,7 +6,7 @@ import styles from 'styles/components/Navigation.module.scss';
 
 export default function NavigationComponent(props) {
   const router = useRouter();
-  const asPath = _.get(router, 'asPath', '/');
+  const [asPath] = _.get(router, 'asPath', '/').split('?');
 
   const makeNavLink = (link) => {
     const id = uuidv4();

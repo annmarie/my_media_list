@@ -33,6 +33,7 @@
     font-weight: normal;
     font-size: 1.1rem;
     color: white;
+    z-index: 20;
   }
 
   th:last-child {
@@ -47,5 +48,15 @@
 
   tr:nth-child(even) td {
     background: #f8f6ff;
+  }
+
+  ul {
+    list-style-type: none;
+  }
+}
+
+.totals {
+  ul {
+    list-style-type: none;
   }
 }

@@ -6,6 +6,7 @@ const appConfig = {
     { title: 'Administration', path: '/' },
     { title: 'Creation', path: '/subscription' }
   ],
+  pageLimit: 10,
   localStorageKey: 'my-media-list'
 };
 
