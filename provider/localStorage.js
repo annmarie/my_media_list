@@ -1,8 +1,6 @@
 import _ from 'lodash';
 import { v4 as uuidv4 } from 'uuid';
 
-
-
 const parseTotals = (payload, totals, props) => {
   function getFrequencyTotals(key, payload) {
     return payload.reduce((total, item) => {
@@ -165,3 +163,5 @@ export function saveItem(props, item) {
     }, 100);
   });
 }
+
+export default { initData, getData, deleteData, getItem, saveItem }
