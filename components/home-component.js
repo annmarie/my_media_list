@@ -6,10 +6,6 @@ import { QueryClient, QueryClientProvider, useQuery } from 'react-query';
 import styles from 'styles/components/Home.module.scss';
 import { useRouter } from 'next/router';
 import { initData, getData, deleteData } from 'provider/localStorage';
-const priceFormatter = new Intl.NumberFormat('en-US', {
-  style: 'currency',
-  currency: 'USD'
-});
 
 export default function HomeComponent(props) {
   const queryClient = new QueryClient();
@@ -133,7 +129,7 @@ function SubscriptionList(props) {
             <a>{item.name}</a>
           </Link>
         </td>
-        <td>{priceFormatter.format(item.price)}</td>
+        <td>{props.formatPrice(item.price)}</td>
         <td>{item.frequency}</td>
         <td onClick={() => removeSubscriptions([item.id])}>
           <Image alt="delete" src="/svgs/delete.svg" width="30px" height="30px" />

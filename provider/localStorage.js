@@ -1,10 +1,7 @@
 import _ from 'lodash';
 import { v4 as uuidv4 } from 'uuid';
 
-const priceFormatter = new Intl.NumberFormat('en-US', {
-  style: 'currency',
-  currency: 'USD'
-});
+
 
 const parseTotals = (payload, totals, props) => {
   function getFrequencyTotals(key, payload) {
@@ -17,8 +14,8 @@ const parseTotals = (payload, totals, props) => {
     }, 0);
   }
 
-  const monthly = priceFormatter.format(getFrequencyTotals('monthly', payload));
-  const yearly = priceFormatter.format(getFrequencyTotals('yearly', payload));
+  const monthly = props.formatPrice(getFrequencyTotals('monthly', payload));
+  const yearly = props.formatPrice(getFrequencyTotals('yearly', payload));
   _.set(totals, 'monthly', monthly, 0);
   _.set(totals, 'yearly', yearly, 0);
   _.set(totals, 'subscriptions', payload.length, 0);
