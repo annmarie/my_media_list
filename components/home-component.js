@@ -5,19 +5,11 @@ import { useState } from 'react';
 import { QueryClient, QueryClientProvider, useQuery } from 'react-query';
 import styles from 'styles/components/Home.module.scss';
 import { useRouter } from 'next/router';
+import { initData, getData, deleteData } from 'provider/localStorage';
 const priceFormatter = new Intl.NumberFormat('en-US', {
   style: 'currency',
   currency: 'USD'
 });
-const getFrequencyTotals = (key, payload) => {
-  return payload.reduce((total, item) => {
-    let price = 0;
-    if (item.frequency === key.toLowerCase()) {
-      price = _.get(item, 'price', 0);
-    }
-    return total + price;
-  }, 0);
-};
 
 export default function HomeComponent(props) {
   const queryClient = new QueryClient();
@@ -28,43 +20,15 @@ export default function HomeComponent(props) {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <SubscriptionList {...props} page={pageNum} offset={offset} />
+      <HomePage {...props} page={pageNum} offset={offset} />
     </QueryClientProvider>
   );
 }
 
-function SubscriptionList(props) {
+function HomePage(props) {
   const [stateData, setData] = useState(0);
   const { status } = useQuery('subscriptions', async () => {
-    return new Promise((good) => {
-      setTimeout(() => {
-        try {
-          const payload = [];
-          const totals = {};
-          for (let i = 0; i < localStorage.length; i++) {
-            const storeKey = localStorage.key(i);
-            if (storeKey.startsWith(props.localStorageKey)) {
-              payload.push(JSON.parse(localStorage.getItem(storeKey)));
-            }
-          }
-          if (payload.length) {
-            const monthly = priceFormatter.format(getFrequencyTotals('monthly', payload));
-            const yearly = priceFormatter.format(getFrequencyTotals('yearly', payload));
-            _.set(totals, 'monthly', monthly, 0);
-            _.set(totals, 'yearly', yearly, 0);
-            _.set(totals, 'subscriptions', payload.length, 0);
-            _.set(totals, 'pages', Math.ceil(payload.length / props.pageLimit));
-            // set data results
-            good({ status: 'success', payload, totals });
-          } else {
-            good({ status: 'success' });
-          }
-        } catch (error) {
-          console.error(error);
-          good({ error, status: 'fail' });
-        }
-      }, 0);
-    }).then((data) => {
+    return getData(props).then((data) => {
       setData(data);
       return data;
     });
@@ -74,7 +38,7 @@ function SubscriptionList(props) {
 
   return _.get(stateData, 'payload') ? (
     <>
-      <TableData {...props} data={stateData} setData={setData} />
+      <SubscriptionList {...props} data={stateData} setData={setData} />
       <Totals {...props} data={stateData} />
     </>
   ) : (
@@ -83,45 +47,10 @@ function SubscriptionList(props) {
 }
 
 function InitButton(props) {
-  // initialize demo data
-  const initData = async () => {
-    let demoData = {};
-    const key = props.localStorageKey;
-    // remove old kys
-    for (let i = 0; i < localStorage.length; i++) {
-      const storeKey = localStorage.key(i);
-      if (storeKey.startsWith(props.localStorageKey)) {
-        localStorage.removeItem(storeKey);
-      }
-    }
-    try {
-      const rset = await fetch('/api/data');
-      demoData = await rset.json();
-    } catch (error) {
-      console.error('data not found');
-      console.error(error);
-    }
-    const payload = _.get(demoData, 'payload', []);
-    const totals = {};
-    payload.forEach((item) => {
-      const storeKey = `${key}-${item.id}`;
-      localStorage.setItem(storeKey, JSON.stringify(item));
-    });
-    const monthly = priceFormatter.format(getFrequencyTotals('monthly', payload));
-    const yearly = priceFormatter.format(getFrequencyTotals('yearly', payload));
-    _.set(totals, 'monthly', monthly, 0);
-    _.set(totals, 'yearly', yearly, 0);
-    _.set(totals, 'subscriptions', payload.length, 0);
-    _.set(totals, 'pages', Math.ceil(payload.length / props.pageLimit));
-
-    props.setData({ payload, totals });
+  const initClick = (_e) => {
+    initData(props).then((data) => props.setData(data));
   };
-
-  return (
-    <>
-      <button onClick={initData}>Initialize The Experience</button>
-    </>
-  );
+  return <button onClick={initClick}>Initialize The Experience</button>;
 }
 
 function Totals(props) {
@@ -140,68 +69,63 @@ function Totals(props) {
   );
 }
 
-function TableData(props) {
+function SubscriptionList(props) {
   const router = useRouter();
   const [deleteList, setDeleteList] = useState([]);
-  const removeSubscriptions = (ids) => {
-    new Promise((good) => {
-      try {
-        for (let i = 0; i < ids.length; i++) {
-          const id = ids[i];
-          const key = props.localStorageKey;
-          localStorage.removeItem(`${key}-${id}`);
-        }
-        good({ status: 'success' });
-      } catch (error) {
-        good({ error, status: 'fail' });
-      }
-    }).then((data) => {
-      if (_.get(data, 'error')) return console.error(data);
-      const payload = [];
-      const totals = {};
-      const oldPayload = props.data.payload;
-      for (let i = 0; i < oldPayload.length; i++) {
-        if (!ids.includes(oldPayload[i].id)) {
-          payload.push(oldPayload[i]);
-        }
-      }
-      if (payload.length) {
-        const monthly = priceFormatter.format(getFrequencyTotals('monthly', payload));
-        const yearly = priceFormatter.format(getFrequencyTotals('yearly', payload));
-        _.set(totals, 'monthly', monthly, 0);
-        _.set(totals, 'yearly', yearly, 0);
-        _.set(totals, 'subscriptions', payload.length, 0);
-        _.set(totals, 'pages', Math.ceil(payload.length / props.pageLimit));
-        // set data results
-        props.setData({ payload, totals });
+
+  const removeSubscriptions = async (ids) => {
+    return deleteData(ids, props).then((data) => {
+      const totals = _.get(data, 'totals');
+      if (totals) {
         const totalPages = _.get(totals, 'pages', 1);
-        if (props.page > totalPages) router.push(`/?page=${totalPages}`);
-      } else {
-        props.setData({});
+        if (props.page > totalPages) {
+          router.push(`/?page=${totalPages}`);
+        }
       }
+      props.setData(data);
     });
   };
 
-  const deleteChecked = (_e) => {
-    removeSubscriptions(deleteList);
-    setDeleteList([]);
-  };
+  function DeleteButtons(props) {
+    const deleteChecked = () => {
+      removeSubscriptions(deleteList);
+      setDeleteList([]);
+    };
 
-  const onCheckChange = (e) => {
-    const value = e.target.value;
-    const checked = e.currentTarget.checked;
-    const newDeleteList = [...deleteList];
-    if (checked) {
-      if (!newDeleteList.includes(value)) {
-        newDeleteList.push(value);
-        setDeleteList(newDeleteList);
+    const deleteAll = () => {
+      removeSubscriptions(props.data.payload.map((i) => i.id));
+      setDeleteList([]);
+    };
+
+    if (props.deleteList.length)
+      return (
+        <div className="delButton">
+          <span>
+            <button onClick={deleteAll}>Delete All</button>
+          </span>
+          <span>
+            <button onClick={deleteChecked}>Delete Checked</button>
+          </span>
+        </div>
+      );
+    else return '';
+  }
+
+  const Row = (item) => {
+    const onCheckChange = (e) => {
+      const value = e.target.value;
+      const checked = e.currentTarget.checked;
+      const newDeleteList = [...deleteList];
+      if (checked) {
+        if (!newDeleteList.includes(value)) {
+          newDeleteList.push(value);
+          setDeleteList(newDeleteList);
+        }
+      } else {
+        setDeleteList(newDeleteList.filter((id) => id != value));
       }
-    } else {
-      setDeleteList(newDeleteList.filter((id) => id != value));
-    }
-  };
+    };
 
-  const displayRow = (item) => {
     return (
       <tr key={item.id} id={item.id}>
         <td>
@@ -221,49 +145,16 @@ function TableData(props) {
     );
   };
 
-  const DeleteListButtons = (props) => {
-    if (props.deleteList.length)
-      return (
-        <div className="delButton">
-          <button onClick={deleteChecked}>Delete Checked</button>
-        </div>
-      );
-    else return '';
-  };
-
-  const PrevNext = (props) => {
-    const page = props.page;
-    const { pages } = { ...props.data.totals };
-    const pageLink = (page, text) => {
-      const href = `/?page=${page}`;
-      return (
-        <>
-          <Link href={href}>
-            <a>{text}</a>
-          </Link>
-        </>
-      );
-    };
-
-    return pages > 1 ? (
-      <span>
-        {(page > 1) ? pageLink(1, '<<') : '<<'}
-        {' | '}
-        {page > 1 ? pageLink(page - 1, '<') : '<'}
-        {' | '}
-        {page < pages ? pageLink(page + 1, '>') : '>'}
-        {' | '}
-        {(page < pages) ? pageLink(pages, '>>') : '>>'}
-      </span>
-    ) : (
-      ''
-    );
-  };
-
   return (
     <div className={styles.home}>
       <PrevNext {...props} />
-      <DeleteListButtons {...props} deleteList={deleteList} />
+      <DeleteButtons
+        {...props}
+        deleteList={deleteList}
+        removeSubscriptions={removeSubscriptions}
+        setDeleteList={setDeleteList}
+        initData={initData}
+      />
       <table>
         <thead>
           <tr>
@@ -277,9 +168,38 @@ function TableData(props) {
         <tbody>
           {_.get(props.data, 'payload', [])
             .slice(props.offset, props.offset + props.pageLimit)
-            .map(displayRow)}
+            .map(Row)}
         </tbody>
       </table>
     </div>
   );
 }
+
+const PrevNext = (props) => {
+  const page = props.page;
+  const { pages } = { ...props.data.totals };
+  const pageLink = (page, text) => {
+    const href = `/?page=${page}`;
+    return (
+      <>
+        <Link href={href}>
+          <a>{text}</a>
+        </Link>
+      </>
+    );
+  };
+
+  return pages > 1 ? (
+    <span>
+      {page > 1 ? pageLink(1, '<<') : '<<'}
+      {' | '}
+      {page > 1 ? pageLink(page - 1, '<') : '<'}
+      {' | '}
+      {page < pages ? pageLink(page + 1, '>') : '>'}
+      {' | '}
+      {page < pages ? pageLink(pages, '>>') : '>>'}
+    </span>
+  ) : (
+    ''
+  );
+};
