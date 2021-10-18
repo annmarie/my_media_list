@@ -1,4 +1,3 @@
-import _ from 'lodash';
 import appPageHandler from 'middleware/app-page-handler';
 import appConfig from 'app-config';
 import Head from 'next/head';
