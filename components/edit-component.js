@@ -43,7 +43,7 @@ function SubscriptionEdit(props) {
       return '';
       // We have things to update!
     } else {
-      return updateItem(props, item).then((data) => setItem(data));
+      return updateItem(props, item, stateItem).then((data) => setItem(data));
     }
   };
 

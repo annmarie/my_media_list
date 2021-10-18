@@ -105,7 +105,8 @@ export const deleteData = async (ids, props) => {
   });
 };
 
-export function updateItem(props, item) {
+export function updateItem(props, item, oldItem) {
+  alert(JSON.stringify({item, oldItem }))
   return new Promise((good) => {
     setTimeout(() => {
       try {
@@ -113,16 +114,16 @@ export function updateItem(props, item) {
         const key = props.localStorageKey;
         if (id) {
           _.set(item, 'id', id);
-          _.set(item, 'created_at', item.created_at);
+          _.set(item, 'created_at', oldItem.created_at);
           _.set(item, 'updated_at', Date.now());
           localStorage.setItem(`${key}-${id}`, JSON.stringify(item));
           good(item);
         } else {
-          good(props.item);
+          good(oldItem);
         }
       } catch (e) {
         console.error(e);
-        good(props.item);
+        good(oldItem);
       }
     }, 100);
   });
