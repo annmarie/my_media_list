@@ -119,7 +119,7 @@ function SubscriptionForm(props) {
         defaultValue={description}
       />
       <br />
-      <input type="submit" />
+      <input type="submit" value="edit subscription" />
       <br />
       <ul>
         <li key="1">updated at: {dayjs(updated_at).format('MM/DD/YYYY HH:mm:ss')}</li>

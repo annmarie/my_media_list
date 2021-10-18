@@ -66,7 +66,7 @@ function SubscriptionForm(props) {
       <br />
       <input size="50" placeholder="description" {...register('description', { required: false })} />
       <br />
-      <input type="submit" />
+      <input type="submit" value="create subscription" />
       <br />
     </form>
   );
