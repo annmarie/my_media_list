@@ -141,6 +141,7 @@ function Totals(props) {
 }
 
 function TableData(props) {
+  const router = useRouter();
   const [deleteList, setDeleteList] = useState([]);
   const removeSubscriptions = (ids) => {
     new Promise((good) => {
@@ -173,6 +174,8 @@ function TableData(props) {
         _.set(totals, 'pages', Math.ceil(payload.length / props.pageLimit));
         // set data results
         props.setData({ payload, totals });
+        const totalPages = _.get(totals, 'pages', 1);
+        if (props.page > totalPages) router.push(`/?page=${totalPages}`);
       } else {
         props.setData({});
       }
@@ -244,9 +247,13 @@ function TableData(props) {
 
     return pages > 1 ? (
       <span>
-        {page > 1 ? pageLink(page - 1, 'prev') : 'prev'}
+        {(page > 1) ? pageLink(1, '<<') : '<<'}
         {' | '}
-        {page < pages ? pageLink(page + 1, 'next') : 'next'}
+        {page > 1 ? pageLink(page - 1, '<') : '<'}
+        {' | '}
+        {page < pages ? pageLink(page + 1, '>') : '>'}
+        {' | '}
+        {(page < pages) ? pageLink(pages, '>>') : '>>'}
       </span>
     ) : (
       ''
