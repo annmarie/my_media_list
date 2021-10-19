@@ -37,3 +37,21 @@ a:visited,
 a:link {
   color: #673ab7;
 }
+
+.pagination {
+  a {
+    color: #673ab7;
+    float: left;
+    padding: 8px 16px;
+    text-decoration: none;
+    transition: background-color .3s;
+  }
+
+   a.active {
+     background-color:  #673ab7;
+     ;
+     color: white;
+   }
+
+  a:hover:not(.active) {background-color: rgb(170, 175, 190);}
+}

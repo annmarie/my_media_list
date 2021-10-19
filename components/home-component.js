@@ -142,7 +142,7 @@ function SubscriptionList(props) {
         </td>
         <td>{props.formatPrice(item.price)}</td>
         <td>{item.frequency}</td>
-        <td onClick={() => removeSubscriptions([item.id])}>
+        <td className={styles.action} onClick={() => removeSubscriptions([item.id])}>
           <Image alt="delete" src="/svgs/delete.svg" width="30px" height="30px" />
         </td>
         <td>
@@ -186,10 +186,10 @@ const PrevNext = (props) => {
   const page = props.page;
   const { pages } = { ...props.data.totals };
   const pageLink = (key, text) => {
-    if (key === page) return <a>{text}</a>;
+    if (key === page) return <a className="active">{text}</a>;
     const href = `/?page=${key}`;
     return (
-      <span className="active">
+      <span>
         <Link href={href}>
           <a>{text}</a>
         </Link>
@@ -198,7 +198,7 @@ const PrevNext = (props) => {
   };
 
   return pages > 1 ? (
-    <span className={styles.pagination}>
+    <span className="pagination">
       {page > 1 ? pageLink(1, '<<') : ''}
       {page > 1 ? pageLink(page - 1, '<') : ''}
       {Array(pages)

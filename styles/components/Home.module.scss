@@ -55,20 +55,12 @@
   }
 }
 
+.action {
+  cursor: pointer;
+}
+
 .totals {
   ul {
     list-style-type: none;
   }
-}
-
-.pagination {
-  a {
-    color: #673ab7;
-    float: left;
-    padding: 8px 16px;
-    text-decoration: none;
-    transition: background-color .3s;
-  }
-
-  a:hover:not(.active) {background-color: #ddd;}
 }
