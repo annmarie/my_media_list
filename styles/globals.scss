@@ -28,3 +28,10 @@ body {
 .delButton {
   float: right;
 }
+
+a:active,
+a:hover,
+a:visited,
+a:link {
+  color: #673ab7;
+}
