@@ -185,26 +185,30 @@ function SubscriptionList(props) {
 const PrevNext = (props) => {
   const page = props.page;
   const { pages } = { ...props.data.totals };
-  const pageLink = (page, text) => {
-    const href = `/?page=${page}`;
+  const pageLink = (key, text) => {
+    if (key === page) return <a>{text}</a>;
+    const href = `/?page=${key}`;
     return (
-      <>
+      <span className="active">
         <Link href={href}>
           <a>{text}</a>
         </Link>
-      </>
+      </span>
     );
   };
 
   return pages > 1 ? (
-    <span>
-      {page > 1 ? pageLink(1, '<<') : '<<'}
-      {' | '}
-      {page > 1 ? pageLink(page - 1, '<') : '<'}
-      {' | '}
-      {page < pages ? pageLink(page + 1, '>') : '>'}
-      {' | '}
-      {page < pages ? pageLink(pages, '>>') : '>>'}
+    <span className={styles.pagination}>
+      {page > 1 ? pageLink(1, '<<') : ''}
+      {page > 1 ? pageLink(page - 1, '<') : ''}
+      {Array(pages)
+        .fill(0)
+        .map((_v, i) => {
+          const key = i + 1;
+          return pageLink(key, key);
+        })}
+      {page < pages ? pageLink(page + 1, '>') : ''}
+      {page < pages ? pageLink(pages, '>>') : ''}
     </span>
   ) : (
     ''
