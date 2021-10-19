@@ -109,6 +109,7 @@ function SubscriptionList(props) {
           <span>
             <button onClick={deleteAll}>Delete All</button>
           </span>
+          {'  '}
           <span>
             <button onClick={deleteChecked}>Delete Checked</button>
           </span>

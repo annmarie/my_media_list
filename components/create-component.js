@@ -51,7 +51,7 @@ function SaveForm(props) {
         <option value="yearly">yearly</option>
       </select>
       <br />
-      <input size="50" placeholder="description" {...register('description', { required: false })} />
+      <input size="50" placeholder="description (optional)" {...register('description', { required: false })} />
       <br />
       <input type="submit" value="create subscription" />
       <br />
