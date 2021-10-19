@@ -46,7 +46,11 @@ function InitButton(props) {
   const initClick = (_e) => {
     initData(props).then((data) => props.setData(data));
   };
-  return <button onClick={initClick}>Initialize The Experience</button>;
+  return <>
+    <button onClick={initClick}>Initialize The Experience</button>
+    { ' or ' }
+    <Link href="/subscription"><a><button>Make Your Own Data</button></a></Link>
+  </>
 }
 
 function Totals(props) {
