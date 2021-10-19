@@ -79,7 +79,7 @@ function UpdateForm(props) {
         <br />
         <select size="2" {...register('frequency')} defaultValue={frequency}>
           <option value="monthly">monthly</option>
-          <option value="annually">annually</option>
+          <option value="yearly">yearly</option>
         </select>
         <br />
         <input

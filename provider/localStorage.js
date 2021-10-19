@@ -106,7 +106,7 @@ export const deleteData = async (ids, props) => {
 };
 
 export function updateItem(props, item, oldItem) {
-  alert(JSON.stringify({item, oldItem }))
+  alert(JSON.stringify({ item, oldItem }));
   return new Promise((good) => {
     setTimeout(() => {
       try {

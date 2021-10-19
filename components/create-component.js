@@ -48,7 +48,7 @@ function SaveForm(props) {
       <br />
       <select size="2" {...register('frequency')} defaultValue={'monthly'}>
         <option value="monthly">monthly</option>
-        <option value="annually">annually</option>
+        <option value="yearly">yearly</option>
       </select>
       <br />
       <input size="50" placeholder="description" {...register('description', { required: false })} />
